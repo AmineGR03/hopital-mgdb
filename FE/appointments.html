@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Rendez-vous - HealthCare Pro</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <i class="fas fa-hospital me-2"></i>
+                <span class="fw-bold">HealthCare Pro</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="patients.html">
+                            <i class="fas fa-users me-1"></i>Patients
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="doctors.html">
+                            <i class="fas fa-user-md me-1"></i>Médecins
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="appointments.html">
+                            <i class="fas fa-calendar-check me-1"></i>Rendez-vous
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="prescriptions.html">
+                            <i class="fas fa-prescription-bottle me-1"></i>Prescriptions
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-2 d-none d-lg-block">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="fas fa-calendar-check me-2"></i>Rendez-vous
+                        </h6>
+                        <div class="list-group list-group-flush">
+                            <a href="#all" class="list-group-item list-group-item-action active" onclick="filterAppointments('all')">
+                                <i class="fas fa-list me-2"></i>Tous les RDV
+                            </a>
+                            <a href="#today" class="list-group-item list-group-item-action" onclick="filterAppointments('today')">
+                                <i class="fas fa-calendar-day me-2"></i>Aujourd'hui
+                            </a>
+                            <a href="#upcoming" class="list-group-item list-group-item-action" onclick="filterAppointments('upcoming')">
+                                <i class="fas fa-calendar-plus me-2"></i>À venir
+                            </a>
+                            <a href="#past" class="list-group-item list-group-item-action" onclick="filterAppointments('past')">
+                                <i class="fas fa-history me-2"></i>Passés
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-10 col-12">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="mb-1">
+                            <i class="fas fa-calendar-check me-2 text-info"></i>Gestion des Rendez-vous
+                        </h2>
+                        <p class="text-muted mb-0">Planifiez et gérez les consultations médicales</p>
+                    </div>
+                    <button class="btn btn-info" onclick="showAddAppointmentModal()">
+                        <i class="fas fa-plus me-2"></i>Nouveau RDV
+                    </button>
+                </div>
+
+                <!-- Filters and Search -->
+                <div class="filter-section">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="search-input">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" id="searchInput" placeholder="Rechercher...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="doctorFilter">
+                                <option value="">Tous les médecins</option>
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="patientFilter">
+                                <option value="">Tous les patients</option>
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="fas fa-times me-1"></i>Effacer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointments Table -->
+                <div class="card shadow">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="fas fa-table me-2"></i>Liste des Rendez-vous
+                            <span class="badge bg-info ms-2" id="appointmentCount">0</span>
+                        </h6>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-info" onclick="exportAppointments()">
+                                <i class="fas fa-download me-1"></i>Exporter
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="refreshAppointments()">
+                                <i class="fas fa-sync-alt me-1"></i>Actualiser
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="appointmentsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Date & Heure</th>
+                                        <th>Patient</th>
+                                        <th>Médecin</th>
+                                        <th>Motif</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data will be loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Loading Spinner -->
+                        <div id="loadingSpinner" class="text-center py-4">
+                            <div class="spinner-border text-info" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                        </div>
+
+                        <!-- No Data Message -->
+                        <div id="noDataMessage" class="text-center py-4 d-none">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucun rendez-vous trouvé</h5>
+                            <p class="text-muted">Créez un nouveau rendez-vous pour commencer.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Appointment Modal -->
+    <div class="modal fade" id="appointmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="appointmentModalTitle">
+                        <i class="fas fa-calendar-plus me-2"></i>Nouveau Rendez-vous
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="appointmentForm">
+                        <input type="hidden" id="appointmentId" name="id">
+
+                        <!-- Patient and Doctor Selection -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="patientId" class="form-label">Patient *</label>
+                                <select class="form-select" id="patientId" name="patientId" required>
+                                    <option value="">Sélectionner un patient</option>
+                                    <!-- Options will be loaded dynamically -->
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="doctorId" class="form-label">Médecin *</label>
+                                <select class="form-select" id="doctorId" name="doctorId" required>
+                                    <option value="">Sélectionner un médecin</option>
+                                    <!-- Options will be loaded dynamically -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Date and Time -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="dateRdv" class="form-label">Date du Rendez-vous *</label>
+                                <input type="date" class="form-control" id="dateRdv" name="dateRdv" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="heureRdv" class="form-label">Heure</label>
+                                <input type="time" class="form-control" id="heureRdv" name="heureRdv">
+                            </div>
+                        </div>
+
+                        <!-- Motif -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="motif" class="form-label">Motif de la Consultation *</label>
+                                <textarea class="form-control" id="motif" name="motif" rows="3" placeholder="Décrivez le motif de la consultation..." required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">Statut</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="planifié">Planifié</option>
+                                    <option value="confirmé">Confirmé</option>
+                                    <option value="annulé">Annulé</option>
+                                    <option value="terminé">Terminé</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Annuler
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="saveAppointment()">
+                        <i class="fas fa-save me-1"></i>Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Appointment Modal -->
+    <div class="modal fade" id="viewAppointmentModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-check me-2"></i>Détails du Rendez-vous
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="appointmentDetails">
+                    <!-- Appointment details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+    <script src="appointments.js"></script>
+</body>
+</html>

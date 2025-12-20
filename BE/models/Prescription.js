@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const PrescriptionSchema = new mongoose.Schema({
-  id: { type: Number, unique: true },
-  patientId: { type: Number, required: true },
-  doctorId: { type: Number, required: true },
+  patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', required: true },
+  doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', required: true },
   medicaments: [String],
   date: Date,
+  validityDays: { type: Number, default: 30 },
   instructions: String
 });
 

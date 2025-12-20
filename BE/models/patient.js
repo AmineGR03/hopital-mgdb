@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const PatientSchema = new mongoose.Schema({
-  id: { type: Number, unique: true },
   nom: String,
   prenom: String,
   dateNaissance: Date,
