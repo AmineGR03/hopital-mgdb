@@ -1,56 +1,28 @@
-const Patient = require("../models/patient");
-
-exports.createPatient = async (req, res) => {
-  try {
-    // Récupérer le dernier id
-    const lastPatient = await Patient.findOne().sort({ id: -1 });
-    const newId = lastPatient ? lastPatient.id + 1 : 1;
-
-    const patient = new Patient({ id: newId, ...req.body });
-    await patient.save();
-    res.status(201).json(patient);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-};
+const Patient = require("../models/Patient");
 
 exports.getAllPatients = async (req, res) => {
-  try {
-    const patients = await Patient.find(); // récupère tous les patients
-    res.status(200).json(patients);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const patients = await Patient.find();
+  res.json(patients);
 };
-exports.getPatientDetails = async (req, res) => {
-  const patientId = req.params.id;
 
-  try {
-    const patientDetails = await Patient.aggregate([
-      { $match: { _id: mongoose.Types.ObjectId(patientId) } },
-      {
-        $lookup: {
-          from: "appointments",
-          localField: "_id",
-          foreignField: "patientId",
-          as: "appointments"
-        }
-      },
-      {
-        $lookup: {
-          from: "prescriptions",
-          localField: "_id",
-          foreignField: "patientId",
-          as: "prescriptions"
-        }
-      }
-    ]);
+exports.getPatientById = async (req, res) => {
+  const patient = await Patient.findById(req.params.id);
+  if (!patient) return res.status(404).json({ message: "Patient non trouvé" });
+  res.json(patient);
+};
 
-    if (!patientDetails.length) return res.status(404).json({ message: "Patient non trouvé" });
+exports.createPatient = async (req, res) => {
+  const patient = new Patient(req.body);
+  await patient.save();
+  res.status(201).json(patient);
+};
 
-    res.json(patientDetails[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+exports.updatePatient = async (req, res) => {
+  const patient = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(patient);
+};
+
+exports.deletePatient = async (req, res) => {
+  await Patient.findByIdAndDelete(req.params.id);
+  res.json({ message: "Patient supprimé" });
 };

@@ -1,8 +1,28 @@
 require("dotenv").config();
-const app = require("./app");
+const express = require("express");
+const cors = require("cors");
 const connectDB = require("./config/db");
 
-connectDB();
+// Import des routes
+const patientRoutes = require("./routes/patient.routes");
+const doctorRoutes = require("./routes/doctor.routes");
+const appointmentRoutes = require("./routes/appointment.routes");
+const prescriptionRoutes = require("./routes/prescription.routes");
 
+const app = express();
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use("/patients", patientRoutes);
+app.use("/doctors", doctorRoutes);
+app.use("/appointments", appointmentRoutes);
+app.use("/prescriptions", prescriptionRoutes);
+
+// Connexion DB et démarrage serveur
+connectDB().then(() => {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}).catch(err => console.error(err));

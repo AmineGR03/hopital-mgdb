@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const patientSchema = new mongoose.Schema({
-  id: { type: Number, required: true, unique: true }, // auto-increment
+const PatientSchema = new mongoose.Schema({
+  id: { type: Number, unique: true },
   nom: String,
   prenom: String,
   dateNaissance: Date,
@@ -14,13 +14,9 @@ const patientSchema = new mongoose.Schema({
     groupe_sanguin: String,
     allergies: [String],
     diagnostics_passes: [
-      {
-        date: Date,
-        condition: String,
-        notes: String
-      }
+      { date: Date, condition: String, notes: String }
     ]
   }
 });
 
-module.exports = mongoose.model("Patient", patientSchema);
+module.exports = mongoose.model("Patient", PatientSchema);
