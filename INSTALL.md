@@ -59,6 +59,8 @@ Créer un fichier `.env` dans le dossier `BE` :
 ```env
 MONGO_URI=mongodb://localhost:27017/hospitalDB
 PORT=3000
+JWT_SECRET=votre-cle-secrete-très-longue-et-complexe-ici
+JWT_EXPIRE=24h
 ```
 
 ## Démarrage du projet
@@ -71,6 +73,11 @@ node seed.js
 ```
 
 Cette commande crée :
+- **4 utilisateurs avec rôles** :
+  - 👑 Admin: `admin` / `admin123`
+  - 🏥 Réceptionniste: `reception` / `reception123`
+  - 👨‍⚕️ Médecin Ali: `dr_ali` / `doctor123`
+  - 👩‍⚕️ Médecin Sara: `dr_sara` / `doctor123`
 - 2 patients avec des antécédents médicaux
 - 2 médecins avec leurs spécialités
 - 2 rendez-vous
@@ -92,7 +99,31 @@ Ouvrez votre navigateur web et allez à :
 http://localhost:3000/index.html
 ```
 
-Ou simplement ouvrez le fichier `FE/index.html` directement dans votre navigateur.
+Ou simplement ouvrez le fichier `FE/login.html` dans votre navigateur pour vous connecter.
+
+## Système d'Authentification
+
+Le système utilise une authentification basée sur les rôles avec JWT :
+
+### Rôles Utilisateur :
+- **👑 Administrateur** : Accès complet à toutes les fonctionnalités
+- **🏥 Réceptionniste** : Gestion des patients, médecins et rendez-vous
+- **👨‍⚕️ Médecin** : Consultation des patients et création de prescriptions
+
+### Comptes de Test :
+Après avoir exécuté `node seed.js`, les comptes suivants sont disponibles :
+
+| Rôle | Utilisateur | Mot de passe | Permissions |
+|------|-------------|--------------|-------------|
+| Admin | `admin` | `admin123` | Toutes |
+| Réceptionniste | `reception` | `reception123` | Patients, Médecins, RDV |
+| Médecin | `dr_ali` | `doctor123` | Patients (lecture), Prescriptions |
+| Médecin | `dr_sara` | `doctor123` | Patients (lecture), Prescriptions |
+
+### Connexion :
+1. Ouvrez `FE/login.html` dans votre navigateur
+2. Utilisez un des comptes ci-dessus
+3. L'interface s'adaptera automatiquement selon votre rôle
 
 ## Structure du projet
 
