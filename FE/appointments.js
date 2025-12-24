@@ -586,3 +586,4 @@ function calculateAge(birthDate) {
 
     return age;
 }
+

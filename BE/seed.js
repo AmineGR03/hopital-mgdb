@@ -2,6 +2,8 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 
+const User = require("./models/User");
+const bcrypt = require('bcryptjs');
 const Patient = require("./models/Patient");
 const Doctor = require("./models/Doctor");
 const Appointment = require("./models/Appointment");
@@ -11,11 +13,16 @@ connectDB();
 
 const seed = async () => {
   try {
-    // Nettoyer la base
+    console.log("🧹 Nettoyage de la base de données...");
+
+    // Nettoyer la base dans l'ordre pour éviter les conflits de clés étrangères
+    await Prescription.deleteMany({});
+    await Appointment.deleteMany({});
+    await User.deleteMany({});
     await Patient.deleteMany({});
     await Doctor.deleteMany({});
-    await Appointment.deleteMany({});
-    await Prescription.deleteMany({});
+
+    console.log("👨‍⚕️ Création des médecins...");
 
     // --- Création des docteurs ---
     const doctors = await Doctor.insertMany([
@@ -32,6 +39,8 @@ const seed = async () => {
         contact: { telephone: "0612345672", adresse: "Casablanca" }
       }
     ]);
+
+    console.log("👥 Création des patients...");
 
     // --- Création des patients ---
     const patients = await Patient.insertMany([
@@ -65,22 +74,109 @@ const seed = async () => {
       }
     ]);
 
+    console.log("👤 Création des utilisateurs avec rôles...");
+
+    // --- Création des utilisateurs ---
+    const users = [];
+    const userData = [
+      {
+        username: "admin",
+        email: "admin@hopital.ma",
+        password: "admin123",
+        role: "admin",
+        isActive: true
+      },
+      {
+        username: "reception",
+        email: "reception@hopital.ma",
+        password: "reception123",
+        role: "receptionist",
+        isActive: true
+      },
+      {
+        username: "dr_ali",
+        email: "ali.hassan@hopital.ma",
+        password: "doctor123",
+        role: "doctor",
+        doctorId: doctors[0]._id,
+        isActive: true
+      },
+      {
+        username: "dr_sara",
+        email: "sara.amal@hopital.ma",
+        password: "doctor123",
+        role: "doctor",
+        doctorId: doctors[1]._id,
+        isActive: true
+      }
+    ];
+
+    for (const userInfo of userData) {
+      // Hash password manually
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(userInfo.password, salt);
+
+      const user = new User({
+        ...userInfo,
+        password: hashedPassword
+      });
+      await user.save();
+      users.push(user);
+    }
+
+    console.log("📅 Création des rendez-vous...");
+
     // --- Création des rendez-vous ---
     await Appointment.insertMany([
-      { patientId: patients[0]._id, doctorId: doctors[0]._id, dateRdv: new Date("2025-12-20"), motif: "Check-up cardio" },
-      { patientId: patients[1]._id, doctorId: doctors[1]._id, dateRdv: new Date("2025-12-22"), motif: "Dermatite" }
+      {
+        patientId: patients[0]._id,
+        doctorId: doctors[0]._id,
+        dateRdv: new Date("2025-12-20T10:00:00"),
+        motif: "Check-up cardio",
+        status: "planifié"
+      },
+      {
+        patientId: patients[1]._id,
+        doctorId: doctors[1]._id,
+        dateRdv: new Date("2025-12-22T14:30:00"),
+        motif: "Dermatite",
+        status: "planifié"
+      }
     ]);
+
+    console.log("💊 Création des prescriptions...");
 
     // --- Création des prescriptions ---
     await Prescription.insertMany([
-      { patientId: patients[0]._id, doctorId: doctors[0]._id, medicaments: ["Aspirin"], date: new Date("2025-12-20"), instructions: "1x/jour" },
-      { patientId: patients[1]._id, doctorId: doctors[1]._id, medicaments: ["Creme hydratante"], date: new Date("2025-12-22"), instructions: "Appliquer 2x/jour" }
+      {
+        patientId: patients[0]._id,
+        doctorId: doctors[0]._id,
+        medicaments: ["Aspirin 100mg"],
+        date: new Date("2025-12-20"),
+        validityDays: 30,
+        instructions: "Prendre 1 comprimé par jour après les repas"
+      },
+      {
+        patientId: patients[1]._id,
+        doctorId: doctors[1]._id,
+        medicaments: ["Crème hydratante dermatologique", "Antihistaminique oral"],
+        date: new Date("2025-12-22"),
+        validityDays: 15,
+        instructions: "Appliquer la crème 2x/jour sur les zones affectées. Prendre l'antihistaminique 1x/jour le soir."
+      }
     ]);
 
     console.log("✅ Seed terminé avec succès !");
+    console.log("\n🔐 Comptes utilisateurs créés :");
+    console.log("👑 Admin: admin / admin123");
+    console.log("🏥 Réceptionniste: reception / reception123");
+    console.log("👨‍⚕️ Médecin Ali: dr_ali / doctor123");
+    console.log("👩‍⚕️ Médecin Sara: dr_sara / doctor123");
+
     process.exit();
   } catch (err) {
     console.error("❌ Erreur lors du seed :", err);
+    console.error("Détails:", err.message);
     process.exit(1);
   }
 };

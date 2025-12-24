@@ -57,15 +57,32 @@ async function apiCall(endpoint, method = 'GET', data = null) {
         },
     };
 
+    // Add authentication token if available
+    const token = localStorage.getItem('authToken');
+    if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
     if (data) {
         config.body = JSON.stringify(data);
     }
 
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+
+        // Handle authentication errors
+        if (response.status === 401) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+            throw new Error('Session expirée');
         }
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue' }));
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
         return await response.json();
     } catch (error) {
         console.error('API call failed:', error);
@@ -202,3 +219,4 @@ window.apiCall = apiCall;
 window.showModal = showModal;
 window.hideModal = hideModal;
 window.validateForm = validateForm;
+

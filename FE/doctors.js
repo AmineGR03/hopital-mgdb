@@ -474,3 +474,4 @@ function exportDoctors() {
 function refreshDoctors() {
     loadDoctors();
 }
+

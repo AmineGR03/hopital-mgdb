@@ -469,3 +469,4 @@ function exportPatients() {
 function refreshPatients() {
     loadPatients();
 }
+
