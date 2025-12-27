@@ -16,3 +16,5 @@ router.put('/change-password', authController.changePassword);
 router.get('/users', requireAdmin, authController.getAllUsers);
 
 module.exports = router;
+
+

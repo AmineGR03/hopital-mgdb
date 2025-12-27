@@ -1,8 +1,12 @@
 const Patient = require("../models/Patient");
 
 exports.getAllPatients = async (req, res) => {
-  const patients = await Patient.find();
-  res.json(patients);
+  try {
+    const patients = await Patient.find();
+    res.json(patients);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
 };
 
 exports.getPatientById = async (req, res) => {

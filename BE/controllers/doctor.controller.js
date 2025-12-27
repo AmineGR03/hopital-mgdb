@@ -1,8 +1,12 @@
 const Doctor = require("../models/Doctor");
 
 exports.getAllDoctors = async (req, res) => {
-  const doctors = await Doctor.find();
-  res.json(doctors);
+  try {
+    const doctors = await Doctor.find();
+    res.json(doctors);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
 };
 
 exports.getDoctorById = async (req, res) => {

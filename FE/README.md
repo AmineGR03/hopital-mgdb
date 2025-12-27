@@ -1,139 +1,70 @@
-# HealthCare Pro - Frontend
+# Getting Started with Create React App
 
-Une interface web complète pour la gestion d'un système médical, développée avec HTML, JavaScript et Bootstrap.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Fonctionnalités
+## Available Scripts
 
-### 🏥 Dashboard Principal
-- **Statistiques en temps réel** : Nombre total de patients, médecins, rendez-vous et prescriptions
-- **Aperçu des rendez-vous récents** : Liste des derniers RDV avec détails
-- **Actions rapides** : Boutons pour créer rapidement des patients, médecins, RDV et prescriptions
+In the project directory, you can run:
 
-### 👥 Gestion des Patients
-- **CRUD complet** : Créer, lire, modifier et supprimer des patients
-- **Informations médicales** : Groupe sanguin, allergies, antécédents médicaux
-- **Filtres avancés** : Recherche par nom, groupe sanguin, genre
-- **Catégorisation** : Patients récents, cas critiques
-- **Export CSV** : Télécharger les données des patients
+### `npm start`
 
-### 👨‍⚕️ Gestion des Médecins
-- **CRUD complet** : Créer, lire, modifier et supprimer des médecins
-- **Spécialités médicales** : Plus de 10 spécialités disponibles
-- **Répartition par spécialité** : Graphiques et statistiques
-- **Filtres par spécialité** : Recherche ciblée
-- **Disponibilité** : Indicateurs de statut
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-### 📅 Gestion des Rendez-vous
-- **Planification complète** : Créer et gérer les consultations
-- **Relations automatiques** : Liaison patient-médecin
-- **Statuts des RDV** : Planifié, confirmé, annulé, terminé
-- **Filtrage temporel** : Aujourd'hui, à venir, passés
-- **Vues détaillées** : Informations complètes sur chaque RDV
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-### 💊 Gestion des Prescriptions
-- **Prescriptions médicales** : Créer des ordonnances complètes
-- **Médicaments multiples** : Ajouter plusieurs médicaments par prescription
-- **Validité temporelle** : Durée de validité configurable
-- **Instructions détaillées** : Recommandations médicales
-- **Statuts** : Actives vs expirées
+### `npm test`
 
-## Technologies Utilisées
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-- **HTML5** : Structure sémantique
-- **CSS3** : Styles personnalisés avec Bootstrap 5
-- **JavaScript ES6+** : Logique applicative
-- **Bootstrap 5** : Framework CSS responsive
-- **Font Awesome** : Icônes professionnelles
-- **Fetch API** : Communication avec le backend
+### `npm run build`
 
-## Architecture
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-### Fichiers Principaux
-- `index.html` - Dashboard principal
-- `patients.html` - Gestion des patients
-- `doctors.html` - Gestion des médecins
-- `appointments.html` - Gestion des rendez-vous
-- `prescriptions.html` - Gestion des prescriptions
-- `style.css` - Styles personnalisés
-- `script.js` - Utilitaires JavaScript communs
-- `patients.js` - Logique patients
-- `doctors.js` - Logique médecins
-- `appointments.js` - Logique rendez-vous
-- `prescriptions.js` - Logique prescriptions
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-### API Backend
-L'application communique avec une API REST sur `http://localhost:3000` :
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-- **Patients** : `GET/POST/PUT/DELETE /patients`
-- **Médecins** : `GET/POST/PUT/DELETE /doctors`
-- **Rendez-vous** : `GET/POST/PUT/DELETE /appointments`
-- **Prescriptions** : `GET/POST/PUT/DELETE /prescriptions`
+### `npm run eject`
 
-## Démarrage
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-1. **Démarrer le backend** :
-   ```bash
-   cd ../BE
-   npm install
-   npm start
-   ```
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-2. **Ouvrir le frontend** :
-   - Ouvrez `index.html` dans votre navigateur
-   - Ou utilisez un serveur local (Live Server, etc.)
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-## Fonctionnalités Clés
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-### 🔍 Filtres et Recherche
-- **Recherche en temps réel** : Filtrage instantané des données
-- **Filtres multiples** : Combinaison de critères
-- **Navigation par catégories** : Onglets latéraux pour un accès rapide
+## Learn More
 
-### 📊 Dashboard Interactif
-- **Mises à jour automatiques** : Statistiques en temps réel
-- **Navigation intuitive** : Menu responsive
-- **Actions contextuelles** : Boutons adaptés à chaque section
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-### 🎨 Interface Professionnelle
-- **Design moderne** : Thème médical professionnel
-- **Responsive design** : Compatible mobile et desktop
-- **Feedback utilisateur** : Messages de confirmation et d'erreur
-- **Animations fluides** : Transitions et effets visuels
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-### 🔄 CRUD Complet
-- **Validation côté client** : Vérification des données
-- **Gestion d'erreurs** : Messages d'erreur informatifs
-- **Confirmation d'actions** : Dialogues de confirmation pour les suppressions
-- **Exports de données** : Téléchargement CSV
+### Code Splitting
 
-## Sécurité et Performance
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-- **Validation des données** : Vérifications côté client
-- **Gestion d'erreurs** : Try/catch et messages utilisateur
-- **Optimisation** : Chargement asynchrone des données
-- **Interface sécurisée** : Prévention des injections XSS
+### Analyzing the Bundle Size
 
-## Maintenance
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Ajout de Nouvelles Fonctionnalités
-1. Créer les nouvelles pages HTML
-2. Ajouter la logique JavaScript correspondante
-3. Mettre à jour la navigation
-4. Tester l'intégration avec l'API
+### Making a Progressive Web App
 
-### Personnalisation du Thème
-- Modifier `style.css` pour les couleurs et styles
-- Utiliser les variables CSS pour la cohérence
-- Respecter la charte graphique médicale
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-## Support
+### Advanced Configuration
 
-Pour toute question ou problème :
-1. Vérifier que le backend est démarré sur le port 3000
-2. Consulter la console du navigateur pour les erreurs JavaScript
-3. Vérifier les logs du serveur backend
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
----
+### Deployment
 
-**HealthCare Pro** - Système de gestion médicale moderne et intuitif.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

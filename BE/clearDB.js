@@ -2,7 +2,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 
-const Patient = require("./models/patient");
+const Patient = require("./models/Patient");
 const Doctor = require("./models/Doctor");
 const Appointment = require("./models/Appointment");
 const Prescription = require("./models/Prescription");

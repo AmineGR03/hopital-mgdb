@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const controller = require("../controllers/appointment.controller");
-const { authenticateToken, requireStaff, requireReceptionist } = require("../middleware/auth");
+const { authenticateToken, requireStaff, requireReceptionist, authorizeRoles } = require("../middleware/auth");
 
 // All routes require authentication
 router.use(authenticateToken);
@@ -9,9 +9,10 @@ router.use(authenticateToken);
 router.get("/", requireStaff, controller.getAllAppointments);
 router.get("/:id", requireStaff, controller.getAppointmentById);
 
-// Routes nécessitant les droits réceptionniste/admin
-router.post("/", requireReceptionist, controller.createAppointment);
-router.put("/:id", requireReceptionist, controller.updateAppointment);
-router.delete("/:id", requireReceptionist, controller.deleteAppointment);
+// Routes nécessitant les droits réceptionniste/admin ou doctor/admin
+const canManageAppointments = authorizeRoles('receptionist', 'doctor', 'admin');
+router.post("/", canManageAppointments, controller.createAppointment);
+router.put("/:id", canManageAppointments, controller.updateAppointment);
+router.delete("/:id", canManageAppointments, controller.deleteAppointment);
 
 module.exports = router;
