@@ -7,6 +7,7 @@ import Doctors from "./pages/Doctors";
 import Prescriptions from "./pages/Prescriptions";
 import Users from "./pages/Users";
 import Profile from "./pages/Profile";
+import Home from "./pages/Home";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const token = localStorage.getItem("token");
@@ -20,7 +21,7 @@ export default function App() {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Appointments />} />
+        <Route path="/" element={<Home />} />
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/patients" element={<Patients />} />
         <Route path="/doctors" element={<Doctors />} />
