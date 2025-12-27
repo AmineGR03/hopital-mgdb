@@ -15,16 +15,17 @@ const seed = async () => {
   try {
     console.log("🧹 Nettoyage de la base de données...");
 
-    // Nettoyer la base dans l'ordre pour éviter les conflits de clés étrangères
-    await Prescription.deleteMany({});
-    await Appointment.deleteMany({});
-    await User.deleteMany({});
-    await Patient.deleteMany({});
-    await Doctor.deleteMany({});
+    // --- Supprimer les collections si elles existent ---
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    for (let coll of collections) {
+      if (["prescriptions", "appointments", "users", "patients", "doctors"].includes(coll.name)) {
+        await mongoose.connection.db.dropCollection(coll.name);
+        console.log(`Collection '${coll.name}' supprimée ✅`);
+      }
+    }
 
     console.log("👨‍⚕️ Création des médecins...");
 
-    // --- Création des docteurs ---
     const doctors = await Doctor.insertMany([
       {
         nom: "Ali",
@@ -42,7 +43,6 @@ const seed = async () => {
 
     console.log("👥 Création des patients...");
 
-    // --- Création des patients ---
     const patients = await Patient.insertMany([
       {
         nom: "Ahmed",
@@ -76,57 +76,24 @@ const seed = async () => {
 
     console.log("👤 Création des utilisateurs avec rôles...");
 
-    // --- Création des utilisateurs ---
     const users = [];
     const userData = [
-      {
-        username: "admin",
-        email: "admin@hopital.ma",
-        password: "admin123",
-        role: "admin",
-        isActive: true
-      },
-      {
-        username: "reception",
-        email: "reception@hopital.ma",
-        password: "reception123",
-        role: "receptionist",
-        isActive: true
-      },
-      {
-        username: "dr_ali",
-        email: "ali.hassan@hopital.ma",
-        password: "doctor123",
-        role: "doctor",
-        doctorId: doctors[0]._id,
-        isActive: true
-      },
-      {
-        username: "dr_sara",
-        email: "sara.amal@hopital.ma",
-        password: "doctor123",
-        role: "doctor",
-        doctorId: doctors[1]._id,
-        isActive: true
-      }
+      { username: "admin", email: "admin@hopital.ma", password: "admin123", role: "admin", isActive: true },
+      { username: "reception", email: "reception@hopital.ma", password: "reception123", role: "receptionist", isActive: true },
+      { username: "dr_ali", email: "ali.hassan@hopital.ma", password: "doctor123", role: "doctor", doctorId: doctors[0]._id, isActive: true },
+      { username: "dr_sara", email: "sara.amal@hopital.ma", password: "doctor123", role: "doctor", doctorId: doctors[1]._id, isActive: true }
     ];
 
     for (const userInfo of userData) {
-      // Hash password manually
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(userInfo.password, salt);
-
-      const user = new User({
-        ...userInfo,
-        password: hashedPassword
-      });
+      const user = new User({ ...userInfo, password: hashedPassword });
       await user.save();
       users.push(user);
     }
 
     console.log("📅 Création des rendez-vous...");
 
-    // --- Création des rendez-vous ---
     await Appointment.insertMany([
       {
         patientId: patients[0]._id,
@@ -146,7 +113,6 @@ const seed = async () => {
 
     console.log("💊 Création des prescriptions...");
 
-    // --- Création des prescriptions ---
     await Prescription.insertMany([
       {
         patientId: patients[0]._id,
@@ -176,7 +142,6 @@ const seed = async () => {
     process.exit();
   } catch (err) {
     console.error("❌ Erreur lors du seed :", err);
-    console.error("Détails:", err.message);
     process.exit(1);
   }
 };
