@@ -1,7 +1,29 @@
 const router = require("express").Router();
 const Appointment = require("../models/Appointment");
 const Prescription = require("../models/Prescription");
-const { authenticateToken, requireDoctor } = require("../middleware/auth");
+const Patient = require("../models/Patient");
+const Doctor = require("../models/Doctor");
+const { authenticateToken, requireDoctor, requireAdmin } = require("../middleware/auth");
+
+// Admin dashboard - global counts
+router.get("/", authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const patients = await Patient.countDocuments();
+    const doctors = await Doctor.countDocuments();
+    const appointments = await Appointment.countDocuments();
+    const prescriptions = await Prescription.countDocuments();
+
+    res.json({
+      patients,
+      doctors,
+      appointments,
+      prescriptions
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Dashboard error" });
+  }
+});
 
 router.get("/doctor", authenticateToken, requireDoctor, async (req, res) => {
   try {

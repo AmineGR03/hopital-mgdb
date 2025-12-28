@@ -29,6 +29,7 @@ app.use("/api/patients", patientRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/prescriptions", prescriptionRoutes);
+app.use("/api/dashboard", require("./routes/dashboard.routes"));
 
 // Test route
 app.get("/api/test", (req, res) => {
@@ -40,7 +41,6 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong!", error: err.message });
 });
-app.use("/api/dashboard", require("./routes/dashboard.routes"));
 
 // Connexion DB et démarrage serveur
 connectDB().then(() => {
