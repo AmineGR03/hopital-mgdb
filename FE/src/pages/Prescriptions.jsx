@@ -18,20 +18,34 @@ export default function Prescriptions() {
     instructions: "",
   });
 
-  const loadData = async () => {
-    try {
-      const presRes = await api.get("/prescriptions");
-      setPrescriptions(presRes.data);
+const loadData = async () => {
+  try {
+    // Récupérer toutes les prescriptions
+    const presRes = await api.get("/prescriptions");
 
-      const patientsRes = await api.get("/patients");
-      setPatients(patientsRes.data);
+    // Récupérer l'ID du docteur en string pour comparaison
+    const doctorIdStr = user.doctorId?._id ? String(user.doctorId._id) : String(user.doctorId);
 
-      const doctorsRes = await api.get("/doctors");
-      setDoctors(doctorsRes.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    // Filtrer uniquement les prescriptions du docteur connecté
+    const filteredPrescriptions =
+      user.role === "doctor"
+        ? presRes.data.filter((p) => String(p.doctorId?._id) === doctorIdStr)
+        : presRes.data;
+
+    setPrescriptions(filteredPrescriptions);
+
+    // Récupérer les patients et médecins pour les dropdowns
+    const patientsRes = await api.get("/patients");
+    setPatients(patientsRes.data);
+
+    const doctorsRes = await api.get("/doctors");
+    setDoctors(doctorsRes.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
 
   useEffect(() => {
     loadData();

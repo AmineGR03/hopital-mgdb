@@ -15,23 +15,31 @@ export default function Navbar() {
           <li className="nav-item">
             <Link className="nav-link" to="/patients">Patients</Link>
           </li>
+
           {user.role !== "doctor" && (
             <li className="nav-item">
               <Link className="nav-link" to="/doctors">Doctors</Link>
             </li>
           )}
-          <li className="nav-item">
-            <Link className="nav-link" to="/prescriptions">Prescriptions</Link>
-          </li>
+
+          {/* Afficher Prescriptions uniquement pour admin et doctor */}
+          {user.role !== "receptionist" && (
+            <li className="nav-item">
+              <Link className="nav-link" to="/prescriptions">Prescriptions</Link>
+            </li>
+          )}
+
           {user.role === "admin" && (
             <li className="nav-item">
               <Link className="nav-link" to="/users">Users</Link>
             </li>
           )}
+
           <li className="nav-item">
             <Link className="nav-link" to="/profile">Profile</Link>
           </li>
         </ul>
+
         <button
           className="btn btn-outline-light"
           onClick={() => {

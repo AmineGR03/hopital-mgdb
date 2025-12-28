@@ -16,31 +16,26 @@ export default function Home() {
   const loadCounts = async () => {
     try {
       if (user.role === "doctor") {
+        // Dashboard médecin
         const res = await api.get("/dashboard/doctor");
         setCounts({
-          patients: 0,
+          patients: res.data.patients,
           doctors: 0,
           appointments: res.data.appointments,
           prescriptions: res.data.prescriptions,
         });
       } else {
-        const [patientsRes, doctorsRes, appointmentsRes, prescriptionsRes] =
-          await Promise.all([
-            api.get("/patients"),
-            api.get("/doctors"),
-            api.get("/appointments"),
-            api.get("/prescriptions"),
-          ]);
-
+        // Dashboard global admin / staff
+        const res = await api.get("/dashboard");
         setCounts({
-          patients: patientsRes.data.length,
-          doctors: doctorsRes.data.length,
-          appointments: appointmentsRes.data.length,
-          prescriptions: prescriptionsRes.data.length,
+          patients: res.data.patients,
+          doctors: res.data.doctors,
+          appointments: res.data.appointments,
+          prescriptions: res.data.prescriptions,
         });
       }
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load dashboard counts:", err);
     }
   };
 
@@ -57,49 +52,52 @@ export default function Home() {
         </h2>
         <p className="text-muted">
           {user.role === "doctor"
-            ? "Tableau de bord personnel"
-            : "Tableau de bord général du système"}
+            ? "Tableau de bord du médecin"
+            : "Tableau de bord général"}
         </p>
       </div>
 
-      {/* Cards navigation */}
+      {/* Dashboard Cards */}
       <div className="row g-4">
         {/* Appointments */}
         <div className="col-md-3">
           <Link to="/appointments" className="text-decoration-none">
-            <div className="card shadow-sm border-0 h-100 text-center hover">
+            <div className="card shadow-sm border-0 text-center h-100">
               <div className="card-body">
                 <div className="fs-1">📅</div>
                 <h6 className="text-muted mt-2">Appointments</h6>
-                <h2 className="fw-bold">{counts.appointments}</h2>
+                <p className="fw-bold text-primary mb-0">View / Edit</p>
+                <p className="fw-bold "> Accedez au rendez-vous</p>
               </div>
             </div>
           </Link>
         </div>
 
         {/* Patients */}
-        {user.role !== "doctor" && (
-          <div className="col-md-3">
-            <Link to="/patients" className="text-decoration-none">
-              <div className="card shadow-sm border-0 h-100 text-center">
-                <div className="card-body">
-                  <div className="fs-1">🧑‍🤝‍🧑</div>
-                  <h6 className="text-muted mt-2">Patients</h6>
-                  <h2 className="fw-bold">{counts.patients}</h2>
-                </div>
+        <div className="col-md-3">
+          <Link to="/patients" className="text-decoration-none">
+            <div className="card shadow-sm border-0 text-center h-100">
+              <div className="card-body">
+                <div className="fs-1">🧑‍🤝‍🧑</div>
+                <h6 className="text-muted mt-2">
+                  {user.role === "doctor" ? "My Patients" : "Patients"}
+                </h6>
+                <p className="fw-bold text-primary mb-0">View / Edit</p>
+                <p className="fw-bold "> Accedez aux patients</p>
               </div>
-            </Link>
-          </div>
-        )}
+            </div>
+          </Link>
+        </div>
 
         {/* Prescriptions */}
         <div className="col-md-3">
           <Link to="/prescriptions" className="text-decoration-none">
-            <div className="card shadow-sm border-0 h-100 text-center">
+            <div className="card shadow-sm border-0 text-center h-100">
               <div className="card-body">
                 <div className="fs-1">💊</div>
                 <h6 className="text-muted mt-2">Prescriptions</h6>
-                <h2 className="fw-bold">{counts.prescriptions}</h2>
+                <p className="fw-bold text-primary mb-0">View / Edit</p>
+                <p className="fw-bold "> Accedez aux prescriptions</p>
               </div>
             </div>
           </Link>
@@ -108,25 +106,28 @@ export default function Home() {
         {/* Profile */}
         <div className="col-md-3">
           <Link to="/profile" className="text-decoration-none">
-            <div className="card shadow-sm border-0 h-100 text-center">
+            <div className="card shadow-sm border-0 text-center h-100">
               <div className="card-body">
                 <div className="fs-1">👤</div>
                 <h6 className="text-muted mt-2">Profile</h6>
-                <p className="fw-bold text-primary mb-0">View / Edit</p>
+                <p className="fw-bold text-primary mb-0 mt-1 ">View / Edit</p>
+                <p className="fw-bold "> Accedez a votre profile</p>
+                
               </div>
             </div>
           </Link>
         </div>
 
-        {/* Doctors (admin only) */}
+        {/* Doctors (Admin only) */}
         {user.role !== "doctor" && (
           <div className="col-md-3">
             <Link to="/doctors" className="text-decoration-none">
-              <div className="card shadow-sm border-0 h-100 text-center">
+              <div className="card shadow-sm border-0 text-center h-100">
                 <div className="card-body">
                   <div className="fs-1">👨‍⚕️</div>
                   <h6 className="text-muted mt-2">Doctors</h6>
-                  <h2 className="fw-bold">{counts.doctors}</h2>
+                  <p className="fw-bold text-primary mb-0 mt-1 ">View / Edit</p>
+                  <h2 className="fw-bold">Accedez aux médecins</h2>
                 </div>
               </div>
             </Link>

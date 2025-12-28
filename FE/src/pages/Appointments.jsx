@@ -17,20 +17,33 @@ export default function Appointments() {
     motif: "",
   });
 
-  const loadData = async () => {
-    try {
-      const appRes = await api.get("/appointments");
-      setAppointments(appRes.data);
+const loadData = async () => {
+  try {
+    
+    const appRes = await api.get("/appointments");
 
-      const patRes = await api.get("/patients");
-      setPatients(patRes.data);
+    
+    const doctorIdStr = user.doctorId?._id ? String(user.doctorId._id) : String(user.doctorId);
 
-      const docRes = await api.get("/doctors");
-      setDoctors(docRes.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    
+    const filteredAppointments =
+      user.role === "doctor"
+        ? appRes.data.filter((a) => String(a.doctorId?._id) === doctorIdStr)
+        : appRes.data;
+
+    setAppointments(filteredAppointments);
+
+    
+    const patRes = await api.get("/patients");
+    setPatients(patRes.data);
+
+    const docRes = await api.get("/doctors");
+    setDoctors(docRes.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   useEffect(() => {
     loadData();
