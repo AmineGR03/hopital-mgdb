@@ -1,87 +1,99 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
+import { store } from "../store/store";
 
 export default function Appointments() {
+  const user = store.user;
+
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
+
   const [form, setForm] = useState({
-    _id: "", // added to track edit
+    _id: "",
     patientId: "",
-    doctorId: "",
+    doctorId: user.role === "doctor" ? user.doctorId : "",
     dateRdv: "",
     motif: "",
   });
 
-  // Load appointments
-  const loadAppointments = async () => {
+  const loadData = async () => {
     try {
-      const res = await api.get("/appointments");
-      setAppointments(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+      const appRes = await api.get("/appointments");
+      setAppointments(appRes.data);
 
-  // Load patients & doctors for select dropdown
-  const loadPatientsAndDoctors = async () => {
-    try {
-      const patientsRes = await api.get("/patients");
-      setPatients(patientsRes.data);
+      const patRes = await api.get("/patients");
+      setPatients(patRes.data);
 
-      const doctorsRes = await api.get("/doctors");
-      setDoctors(doctorsRes.data);
+      const docRes = await api.get("/doctors");
+      setDoctors(docRes.data);
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    loadAppointments();
-    loadPatientsAndDoctors();
+    loadData();
   }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Add or update appointment
   const addOrUpdateAppointment = async () => {
     try {
-      if (form._id) {
-        // Edit mode: update
-        await api.put(`/appointments/${form._id}`, form);
-      } else {
-        // Add mode: create
-        await api.post("/appointments", form);
+      if (!form.patientId || !form.dateRdv) {
+        return alert("Patient et date obligatoires");
       }
-      // Reset form
-      setForm({ _id: "", patientId: "", doctorId: "", dateRdv: "", motif: "" });
-      loadAppointments();
+
+      const payload = {
+        patientId: form.patientId,
+        doctorId: user.role === "doctor" ? user.doctorId : form.doctorId,
+        dateRdv: new Date(form.dateRdv).toISOString(),
+        motif: form.motif,
+      };
+
+      if (form._id) {
+        await api.put(`/appointments/${form._id}`, payload);
+      } else {
+        await api.post("/appointments", payload);
+      }
+
+      setForm({
+        _id: "",
+        patientId: "",
+        doctorId: user.role === "doctor" ? user.doctorId : "",
+        dateRdv: "",
+        motif: "",
+      });
+
+      loadData();
     } catch (err) {
       console.error(err);
-      alert("Error saving appointment");
+      alert("Erreur lors de l'enregistrement");
     }
   };
 
   const deleteAppointment = async (id) => {
-    if (!window.confirm("Delete this appointment?")) return;
+    if (!window.confirm("Supprimer ce rendez-vous ?")) return;
     try {
       await api.delete(`/appointments/${id}`);
-      loadAppointments();
+      loadData();
     } catch (err) {
       console.error(err);
-      alert("Error deleting appointment");
+      alert("Erreur suppression");
     }
   };
 
-  // Populate form for editing
   const editAppointment = (a) => {
     setForm({
       _id: a._id,
       patientId: a.patientId?._id || "",
-      doctorId: a.doctorId?._id || "",
-      dateRdv: a.dateRdv ? new Date(a.dateRdv).toISOString().slice(0,16) : "",
+      doctorId:
+        user.role === "doctor" ? user.doctorId : a.doctorId?._id || "",
+      dateRdv: a.dateRdv
+        ? new Date(a.dateRdv).toISOString().slice(0, 16)
+        : "",
       motif: a.motif || "",
     });
   };
@@ -90,6 +102,7 @@ export default function Appointments() {
     <div className="container mt-4">
       <h2 className="mb-4">Appointments</h2>
 
+      {/* FORM */}
       <div className="card mb-4">
         <div className="card-body">
           <div className="row g-3">
@@ -100,7 +113,7 @@ export default function Appointments() {
                 onChange={handleChange}
                 className="form-select"
               >
-                <option value="">Select Patient</option>
+                <option value="">Sélectionner un patient</option>
                 {patients.map((p) => (
                   <option key={p._id} value={p._id}>
                     {p.nom} {p.prenom}
@@ -108,21 +121,25 @@ export default function Appointments() {
                 ))}
               </select>
             </div>
-            <div className="col-md-6">
-              <select
-                name="doctorId"
-                value={form.doctorId}
-                onChange={handleChange}
-                className="form-select"
-              >
-                <option value="">Select Doctor</option>
-                {doctors.map((d) => (
-                  <option key={d._id} value={d._id}>
-                    {d.nom} {d.prenom} ({d.specialite})
-                  </option>
-                ))}
-              </select>
-            </div>
+
+            {user.role !== "doctor" && (
+              <div className="col-md-6">
+                <select
+                  name="doctorId"
+                  value={form.doctorId}
+                  onChange={handleChange}
+                  className="form-select"
+                >
+                  <option value="">Sélectionner un médecin</option>
+                  {doctors.map((d) => (
+                    <option key={d._id} value={d._id}>
+                      {d.nom} {d.prenom}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="col-md-6">
               <input
                 type="datetime-local"
@@ -132,57 +149,79 @@ export default function Appointments() {
                 className="form-control"
               />
             </div>
+
             <div className="col-md-6">
               <input
-                type="text"
-                placeholder="Motif"
                 name="motif"
+                placeholder="Motif"
                 value={form.motif}
                 onChange={handleChange}
                 className="form-control"
               />
             </div>
+
             <div className="col-12">
-              <button onClick={addOrUpdateAppointment} className="btn btn-primary">
-                {form._id ? "Save" : "Add"}
+              <button
+                onClick={addOrUpdateAppointment}
+                className={`btn ${
+                  form._id ? "btn-warning" : "btn-primary"
+                }`}
+              >
+                {form._id ? "Modifier" : "Ajouter"}
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="table-responsive">
-        <table className="table table-striped table-bordered">
-          <thead className="table-dark">
-            <tr>
-              <th>Patient</th>
-              <th>Doctor</th>
-              <th>Date</th>
-              <th>Motif</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {appointments.map((a) => (
-              <tr key={a._id}>
-                <td>
-                  {a.patientId?.nom} {a.patientId?.prenom}
-                </td>
-                <td>
-                  {a.doctorId?.nom} {a.doctorId?.prenom}
-                </td>
-                <td>{new Date(a.dateRdv).toLocaleString()}</td>
-                <td>{a.motif}</td>
-                <td>{a.status}</td>
-                <td>
-                  <button onClick={() => editAppointment(a)} className="btn btn-sm btn-warning me-2">Edit</button>
-                  <button onClick={() => deleteAppointment(a._id)} className="btn btn-sm btn-danger">Delete</button>
-                </td>
+      {/* TABLE */}
+      <div className="card">
+        <div className="card-body table-responsive">
+          <table className="table table-bordered table-hover">
+            <thead className="table-light">
+              <tr>
+                <th>Patient</th>
+                <th>Médecin</th>
+                <th>Date</th>
+                <th>Motif</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {appointments.map((a) => (
+                <tr key={a._id}>
+                  <td>{a.patientId?.nom} {a.patientId?.prenom}</td>
+                  <td>{a.doctorId?.nom} {a.doctorId?.prenom}</td>
+                  <td>{new Date(a.dateRdv).toLocaleString()}</td>
+                  <td>{a.motif}</td>
+                  <td>{a.status}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-outline-primary me-2"
+                      onClick={() => editAppointment(a)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => deleteAppointment(a._id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {appointments.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="text-center">
+                    Aucun rendez-vous
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
