@@ -60,74 +60,85 @@ export default function Home() {
       {/* Dashboard Cards */}
       <div className="row g-4">
         {/* Appointments */}
-        <div className="col-md-3">
+        <div className="col-lg-3 col-md-6">
           <Link to="/appointments" className="text-decoration-none">
-            <div className="card shadow-sm border-0 text-center h-100">
-              <div className="card-body">
-                <div className="fs-1">📅</div>
-                <h6 className="text-muted mt-2">Appointments</h6>
-                <p className="fw-bold text-primary mb-0">View / Edit</p>
-                <p className="fw-bold "> Accedez au rendez-vous</p>
+            <div className="card shadow border-0 text-center h-100" style={{borderRadius: '12px'}}>
+              <div className="card-body p-4">
+                <div className="mb-3">
+                  <span className="fs-1">📅</span>
+                </div>
+                <h6 className="card-title fw-bold mb-2">Appointments</h6>
+                <p className="text-muted small mb-3">Manage appointments</p>
+                <span className="badge bg-primary">Access</span>
               </div>
             </div>
           </Link>
         </div>
 
         {/* Patients */}
-        <div className="col-md-3">
+        <div className="col-lg-3 col-md-6">
           <Link to="/patients" className="text-decoration-none">
-            <div className="card shadow-sm border-0 text-center h-100">
-              <div className="card-body">
-                <div className="fs-1">🧑‍🤝‍🧑</div>
-                <h6 className="text-muted mt-2">
+            <div className="card shadow border-0 text-center h-100" style={{borderRadius: '12px'}}>
+              <div className="card-body p-4">
+                <div className="mb-3">
+                  <span className="fs-1">🧑‍🤝‍🧑</span>
+                </div>
+                <h6 className="card-title fw-bold mb-2">
                   {user.role === "doctor" ? "My Patients" : "Patients"}
                 </h6>
-                <p className="fw-bold text-primary mb-0">View / Edit</p>
-                <p className="fw-bold "> Accedez aux patients</p>
+                <p className="text-muted small mb-3">Patient records</p>
+                <span className="badge bg-success">Access</span>
               </div>
             </div>
           </Link>
         </div>
 
-        {/* Prescriptions */}
-        <div className="col-md-3">
-          <Link to="/prescriptions" className="text-decoration-none">
-            <div className="card shadow-sm border-0 text-center h-100">
-              <div className="card-body">
-                <div className="fs-1">💊</div>
-                <h6 className="text-muted mt-2">Prescriptions</h6>
-                <p className="fw-bold text-primary mb-0">View / Edit</p>
-                <p className="fw-bold "> Accedez aux prescriptions</p>
+        {/* Prescriptions (Admin and Doctor only) */}
+        {(user.role === "admin" || user.role === "doctor") && (
+          <div className="col-lg-3 col-md-6">
+            <Link to="/prescriptions" className="text-decoration-none">
+              <div className="card shadow border-0 text-center h-100" style={{borderRadius: '12px'}}>
+                <div className="card-body p-4">
+                  <div className="mb-3">
+                    <span className="fs-1">💊</span>
+                  </div>
+                  <h6 className="card-title fw-bold mb-2">Prescriptions</h6>
+                  <p className="text-muted small mb-3">Manage prescriptions</p>
+                  <span className="badge bg-info">Access</span>
+                </div>
               </div>
-            </div>
-          </Link>
-        </div>
+            </Link>
+          </div>
+        )}
 
         {/* Profile */}
-        <div className="col-md-3">
+        <div className="col-lg-3 col-md-6">
           <Link to="/profile" className="text-decoration-none">
-            <div className="card shadow-sm border-0 text-center h-100">
-              <div className="card-body">
-                <div className="fs-1">👤</div>
-                <h6 className="text-muted mt-2">Profile</h6>
-                <p className="fw-bold text-primary mb-0 mt-1 ">View / Edit</p>
-                <p className="fw-bold "> Accedez a votre profile</p>
-                
+            <div className="card shadow border-0 text-center h-100" style={{borderRadius: '12px'}}>
+              <div className="card-body p-4">
+                <div className="mb-3">
+                  <span className="fs-1">👤</span>
+                </div>
+                <h6 className="card-title fw-bold mb-2">Profile</h6>
+                <p className="text-muted small mb-3">Update profile</p>
+                <span className="badge bg-warning">Settings</span>
               </div>
             </div>
           </Link>
         </div>
 
-        {/* Doctors (Admin only) */}
+        {/* Doctors (Admin and Receptionist only) */}
         {user.role !== "doctor" && (
-          <div className="col-md-3">
+          <div className="col-lg-3 col-md-6">
             <Link to="/doctors" className="text-decoration-none">
-              <div className="card shadow-sm border-0 text-center h-100">
-                <div className="card-body">
-                  <div className="fs-1">👨‍⚕️</div>
-                  <h6 className="text-muted mt-2">Doctors</h6>
-                  <p className="fw-bold text-primary mb-0 mt-1 ">View / Edit</p>
-                  <h2 className="fw-bold">Accedez aux médecins</h2>
+              <div className="card shadow border-0 text-center h-100" style={{borderRadius: '12px'}}>
+                <div className="card-body p-4">
+                  <div className="mb-3">
+                    <span className="fs-1">👨‍⚕️</span>
+                  </div>
+                  <h6 className="card-title fw-bold mb-2">Doctors</h6>
+                  <p className="text-muted small mb-3">Manage doctors</p>
+                  <span className="badge bg-danger">Manage</span>
                 </div>
               </div>
             </Link>

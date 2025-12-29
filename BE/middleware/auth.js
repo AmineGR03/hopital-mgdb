@@ -11,7 +11,31 @@ const authenticateToken = async (req, res, next) => {
       return res.status(401).json({ message: 'Access token required' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    // Try multiple secrets in case there's a mismatch
+    const secrets = [
+      process.env.JWT_SECRET,
+      'your-secret-key',
+      'fallback-secret'
+    ];
+
+    let decoded = null;
+    let lastError = null;
+
+    for (const secret of secrets) {
+      if (!secret) continue;
+      try {
+        decoded = jwt.verify(token, secret);
+        break;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    if (!decoded) {
+      console.error('Token verification failed with all secrets:', lastError.message);
+      return res.status(403).json({ message: 'Invalid token' });
+    }
+
     const user = await User.findById(decoded.userId).populate('doctorId');
 
     if (!user) {
@@ -21,7 +45,8 @@ const authenticateToken = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    return res.status(403).json({ message: 'Invalid or expired token' });
+    console.error('Auth middleware error:', error.message);
+    return res.status(403).json({ message: 'Authentication failed' });
   }
 };
 

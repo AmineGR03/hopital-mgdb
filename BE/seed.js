@@ -9,11 +9,14 @@ const Doctor = require("./models/Doctor");
 const Appointment = require("./models/Appointment");
 const Prescription = require("./models/Prescription");
 
-connectDB();
+
 
 const seed = async () => {
   try {
     console.log("🧹 Nettoyage de la base de données...");
+
+    // ensure DB connection is established before accessing mongoose.connection.db
+    await connectDB();
 
     // --- Supprimer les collections si elles existent ---
     const collections = await mongoose.connection.db.listCollections().toArray();

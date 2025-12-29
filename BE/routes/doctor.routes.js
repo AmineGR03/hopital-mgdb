@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const controller = require("../controllers/doctor.controller");
-const { authenticateToken, requireStaff, requireReceptionist } = require("../middleware/auth");
+const { authenticateToken, requireStaff, requireReceptionist, requireDoctor } = require("../middleware/auth");
 
 // All routes require authentication
 router.use(authenticateToken);
@@ -13,5 +13,8 @@ router.get("/:id", requireStaff, controller.getDoctorById);
 router.post("/", requireReceptionist, controller.createDoctor);
 router.put("/:id", requireReceptionist, controller.updateDoctor);
 router.delete("/:id", requireReceptionist, controller.deleteDoctor);
+
+// Route pour que les médecins puissent modifier leurs propres informations
+router.put("/profile/:id", requireDoctor, controller.updateOwnDoctor);
 
 module.exports = router;

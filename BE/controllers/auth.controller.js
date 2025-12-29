@@ -104,36 +104,69 @@ exports.logout = async (req, res) => {
   }
 };
 
-// @desc    Change password
+// @desc    Update profile (username, email, password)
 // @route   PUT /auth/change-password
 // @access  Private
 exports.changePassword = async (req, res) => {
   try {
-    const { currentPassword, newPassword } = req.body;
-
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({
-        message: 'Mot de passe actuel et nouveau mot de passe requis'
-      });
-    }
+    const { username, email, password, currentPassword } = req.body;
 
     // Find user with password
     const user = await User.findById(req.user._id).select('+password');
 
-    // Verify current password
-    const isCurrentPasswordValid = await user.comparePassword(currentPassword);
-    if (!isCurrentPasswordValid) {
-      return res.status(400).json({ message: 'Mot de passe actuel incorrect' });
+    // Handle password change if provided
+    if (password && password.trim()) {
+      // If user wants to change password, require current password for security
+      if (!currentPassword) {
+        return res.status(400).json({
+          message: 'Mot de passe actuel requis pour changer le mot de passe'
+        });
+      }
+
+      // Verify current password
+      const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ message: 'Mot de passe actuel incorrect' });
+      }
+
+      // Update password (pre-save middleware will hash it)
+      user.password = password;
     }
 
-    // Update password (pre-save middleware will hash it)
-    user.password = newPassword;
+    // Handle username change if provided
+    if (username && username !== user.username) {
+      const existingUsername = await User.findOne({ username });
+      if (existingUsername && existingUsername._id.toString() !== user._id.toString()) {
+        return res.status(400).json({ message: 'Ce nom d\'utilisateur existe déjà' });
+      }
+      user.username = username;
+    }
+
+    // Handle email change if provided
+    if (email && email !== user.email) {
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail && existingEmail._id.toString() !== user._id.toString()) {
+        return res.status(400).json({ message: 'Cet email existe déjà' });
+      }
+      user.email = email;
+    }
+
     await user.save();
 
-    res.json({ success: true, message: 'Mot de passe modifié avec succès' });
+    res.json({
+      success: true,
+      message: 'Profil modifié avec succès',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        doctorId: user.doctorId
+      }
+    });
 
   } catch (error) {
-    console.error('Change password error:', error);
+    console.error('Update profile error:', error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
